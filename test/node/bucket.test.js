@@ -7,6 +7,7 @@ const oss = require('../..');
 const config = require('../config').oss;
 const ms = require('humanize-ms');
 const { metaSyncTime, timeout } = require('../config');
+const { sleep } = require('./utils');
 
 // only run on travis ci
 
@@ -696,8 +697,11 @@ describe('test/bucket.test.js', () => {
         const tag = { a: '1', b: '2' };
         await store.putBucketTags(bucket, tag);
 
-        result = await store.deleteBucketTags(bucket);
+        result = await store.deleteBucketTags(bucket, ['a']);
         assert.strictEqual(result.status, 204);
+        await sleep(4000);
+        const deleteAll = await store.deleteBucketTags(bucket);
+        assert.strictEqual(deleteAll.status, 204);
 
         result = await store.getBucketTags(bucket);
         assert.strictEqual(result.status, 200);
